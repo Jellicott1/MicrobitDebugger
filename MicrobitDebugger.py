@@ -70,7 +70,7 @@ class _AnalogPin:
 
     def set_analog_period(self, period):
         if isinstance(period, int) and period >= 1:
-            self.periodMicroSeconds = 1000*period
+            self.periodMicroSeconds = 1000 * period
         else:
             raise ValueError("Period must be an integer >= 1.")
 
@@ -94,24 +94,68 @@ class _TouchPin:
         except ValueError:
             raise ValueError("Input must be a boolean.")
 
+
 class Image:
     EMPTY = "00000:" * 5
     HEART = "09090:" + "90909:" + "90009:" + "09090:" + "00900:"
 
     def __init__(self, image=EMPTY):
-        self.image = list(image)
+        self._image = list(image)
+        self._width = 5
+        self._height = 5
 
     def __str__(self):
         out = "\n"
-        for i in range(5):
-            out += "".join(self.image[i * 6:i * 6 + 5]) + "\n"
+        for i in range(self._height):
+            out += "".join(self._image[i * (self._width + 1):i * (self._width + 1) + self._width]) + "\n"
         return out
 
+    def width(self):
+        return self._width
+
+    def height(self):
+        return self._height
+
     def get_pixel(self, x, y):
-        return self.image[x + 6 * y]
+        return self._image[x + (self._width + 1) * y]
 
     def set_pixel(self, x, y, value):
-        self.image[x + 6 * y] = value
+        self._image[x + (self._width + 1) * y] = value
+
+    def shift_left(self, n):
+        # TODO write shift_left method.
+        return
+
+    def shift_right(self, n):
+        # TODO write shift_right method.
+        return
+
+    def shift_up(self, n):
+        # TODO write shift_up method.
+        return
+
+    def shift_down(self, n):
+        # TODO write shift_down method.
+        return
+
+    def crop(self, x, y, w, h):
+        # TODO write crop method.
+        return
+
+    def copy(self):
+        return self.Image
+
+    def invert(self):
+        # TODO write invert method.
+        return
+
+    def fill(self, value):
+        # TODO write fill method.
+        return
+
+    def blit(self, src, x, y, w, h, xdest=0, ydest=0):
+        # TODO write blit method.
+        return
 
 
 class _Display:
@@ -121,6 +165,51 @@ class _Display:
         self.QUIET_MODE = True
         self.log = ["===== Python Debug Mode ====="]
         self.logCount = 0
+        self.isOn = True
+
+    def get_pixel(self, x, y):
+        return self.image.get_pixel(x, y)
+
+    def set_pixel(self, x, y, value):
+        self.image.set_pixel(x, y, value)
+        print(self.image)
+
+    def clear(self):
+        self.image = Image.EMPTY
+
+    def show(self, image: Image):
+        self.qprint(image)
+        self.image = image
+
+    def show(self, value, delay=400, *, wait=True, loop=False, clear=False):
+        # TODO implement string value image show.
+        self.qprint(value)
+        # self.image = image
+
+    def scroll(self, value, delay=150, *, wait=True, loop=False, monospace=False):
+        # TODO implement other arguments.
+        self.qprint(value)
+
+    def on(self):
+        print("Display on.")
+        self.isOn = True
+
+    def off(self):
+        print("Display off.")
+        self.isOn = False
+
+    def is_on(self):
+        return self.isOn
+
+    def read_light_level(self):
+        try:
+            value = int(input("Enter desired light level (0 to 255): "))
+            if 0 <= value <= 255:
+                return value
+            else:
+                raise ValueError("Level must be an integer between 0 and 255.")
+        except ValueError:
+            raise TypeError("Level must be an integer between 0 and 255.")
 
     def qprint(self, text):
         if self.log[len(self.log) - 1] == text:
@@ -132,29 +221,12 @@ class _Display:
             print(text)
         self.log.append(text)
 
-    def scroll(self, text, wait=False):
-        self.qprint(text)
-
-    def show(self, image):
-        self.qprint(image)
-        self.image = image
-
-    def clear(self):
-        self.image = Image.EMPTY
-
-    def set_pixel(self, x, y, value):
-        self.image.set_pixel(x, y, value)
-        print(self.image)
-
-    def get_pixel(self, x, y):
-        return self.image.get_pixel(x, y)
-
 
 class _MicroBit:
 
     @staticmethod
     def time_ms():
-        return int(time()*1000)
+        return int(time() * 1000)
 
     def __init__(self):
         self.isPanicMode = False
