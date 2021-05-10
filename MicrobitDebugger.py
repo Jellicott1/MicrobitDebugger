@@ -1,5 +1,7 @@
 from time import time
 
+# TODO Consider switching raise statements on user input to infinite loops waiting for a valid input.
+
 print("===== Python Debug Mode =====")
 
 
@@ -93,6 +95,90 @@ class _TouchPin:
             return bool(input("Enter pin touched status (True/False)"))
         except ValueError:
             raise ValueError("Input must be a boolean.")
+
+
+class _Accelerometer:
+
+    def __init__(self):
+        self.log = []
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.gestureList = ["up", "down", "left", "right", "face up", "face down", "freefall", "3g", "6g", "8g", "shake"]
+
+    def get_x(self):
+        try:
+            value = int(input("Enter desired x acceleration (0 to 1024): "))
+            if 0 <= value <= 1024:
+                return value
+            else:
+                raise ValueError("Acceleration must be an integer between 0 and 1024.")
+        except ValueError:
+            raise TypeError("Acceleration must be an integer between 0 and 1024.")
+
+    def get_y(self):
+        try:
+            value = int(input("Enter desired x acceleration (0 to 1024): "))
+            if 0 <= value <= 1024:
+                return value
+            else:
+                raise ValueError("Acceleration must be an integer between 0 and 1024.")
+        except ValueError:
+            raise TypeError("Acceleration must be an integer between 0 and 1024.")
+
+    def get_z(self):
+        try:
+            value = int(input("Enter desired x acceleration (0 to 1024): "))
+            if 0 <= value <= 1024:
+                return value
+            else:
+                raise ValueError("Acceleration must be an integer between 0 and 1024.")
+        except ValueError:
+            raise TypeError("Acceleration must be an integer between 0 and 1024.")
+
+    def get_values(self):
+        try:
+            value = input("Enter desired x, y, z acceleration (0 to 1024): ")
+            value = tuple(map(int, value.split(', ')))
+            for i in value:
+                if not 0 <= i <= 1024:
+                    raise ValueError("Acceleration must be a comma separated list of integers between 0 and 1024.")
+            return value
+        except ValueError:
+            raise TypeError("Acceleration must be a comma separated list of integers between 0 and 1024.")
+
+    def current_gesture(self):
+        value = input("Enter desired gesture.")
+        if value in self.gestureList:
+            return value
+        else:
+            raise ValueError('Gesture must be "up", "down", "left", "right", "face up", "face down", "freefall", "3g", '
+                             '"6g", "8g", or "shake".')
+
+    def is_gesture(self, name):
+        try:
+            return bool(input("Is current gesture {}? ".format(name)))
+        except ValueError:
+            raise ValueError("input must be a boolean.")
+
+    def was_gesture(self, name):
+        try:
+            return bool(input("Was gesture {} done since last call? ".format(name)))
+        except ValueError:
+            raise ValueError("input must be a boolean.")
+
+    def get_gestures(self):
+        try:
+            value = input("Enter desired x, y, z acceleration (0 to 1024): ")
+            value = tuple(value.split(', '))
+            for i in value:
+                if i not in self.gestureList:
+                    raise ValueError('Gestures must be a comma separated list of "up", "down", "left", "right", '
+                                     '"face up", "face down", "freefall", "3g", "6g", "8g", or "shake".')
+            return value
+        except ValueError:
+            raise ValueError('Gestures must be a comma separated list of "up", "down", "left", "right", "face up", '
+                             '"face down", "freefall", "3g", "6g", "8g", or "shake".')
 
 
 class Image:
@@ -234,6 +320,7 @@ class _MicroBit:
         self.timeSlept = 0
 
         self.display = _Display()
+        self.accelerometer = _Accelerometer()
 
         self.button_a = _Button('A')
         self.button_b = _Button('B')
@@ -282,6 +369,7 @@ class _MicroBit:
 
 _microbit = _MicroBit()
 display = _microbit.display
+accelerometer = _microbit.accelerometer
 button_a = _microbit.button_a
 button_b = _microbit.button_b
 pin0 = _microbit.pin0
