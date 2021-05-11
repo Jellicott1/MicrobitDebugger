@@ -124,7 +124,7 @@ class _TouchPin:
         self.type = "touch"
         self.function = function
         self.CAPACITIVE = "CAPACITIVE"
-        self.RESISITIVE = "RESISTIVE"
+        self.RESISTIVE = "RESISTIVE"
         self.touch_mode = self.CAPACITIVE
 
     def is_touched(self):
