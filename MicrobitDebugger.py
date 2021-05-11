@@ -3,9 +3,31 @@ from time import time
 # TODO Consider switching raise statements on user input to infinite loops waiting for a valid input.
 
 print("===== Python Debug Mode =====")
+_prevPrint = "===== Python Debug Mode ====="
+_logCount = 1
 
-def implement(name):
+
+def _implement(name):
     print('{} method is not implemented yet.'.format(name))
+
+
+def _qprint(text, prefix=""):
+    global _prevPrint, _logCount
+    if _prevPrint == text:
+        _logCount += 1
+    elif _logCount > 1:
+        print("REPEAT: {}".format(_logCount))
+        if prefix == "":
+            print(text)
+        else:
+            print("{}: {}".format(prefix, text))
+        _logCount = 1
+    else:
+        if prefix == "":
+            print(text)
+        else:
+            print("{}: {}".format(prefix, text))
+    _prevPrint = text
 
 
 class _Button:
@@ -203,6 +225,7 @@ class _AudioFrame:
     def __iter__(self):
         return self.data
 
+
 class _Audio:
 
     GIGGLE = "Giggle sound"
@@ -220,17 +243,74 @@ class _Audio:
         self.isPlaying = False
         self.default_pin = pin
 
-    def play(self, source, wait=True, pin=self.default_pin, return_pin=None):
+    def play(self, source, wait=True, pin=None, return_pin=None):
+        if isinstance(pin, type(None)):
+            pin = self.default_pin
         # TODO write play method.
-        implement('play')
+        _implement('play')
 
     def is_playing(self):
         # TODO write is_playing method
-        implement('is_playing')
+        _implement('is_playing')
 
     def stop(self):
         # TODO write stop method
-        implement('stop')
+        _implement('stop')
+
+
+class _Compass:
+
+    def __init__(self):
+        self.calibrated = False
+
+    def calibrate(self):
+        print("Calibrating compass...")
+        self.calibrated = True
+        print("Calibrated.")
+
+    def is_calibrated(self):
+        value = input("Is the compass calibrated? (True/False or \"c\" for current value)")
+        try:
+            self.calibrated = bool(value)
+            return value
+        except ValueError:
+            if value == "c":
+                return self.calibrated
+            else:
+                raise ValueError("Value must be either bool or \"c\".")
+
+    def clear_calibration(self):
+        self.calibrated = False
+
+    def get_coord(self, axis):
+        value = input("Enter desired {} value: ".format(axis))
+        try:
+            return int(value)
+        except ValueError:
+            raise TypeError("Value must be an integer.")
+
+    def get_x(self):
+        self.get_coord('x')
+
+    def get_y(self):
+        self.get_coord('y')
+
+    def get_z(self):
+        self.get_coord('z')
+
+    def heading(self):
+        value = input("Enter desired heading (0 to 360): ")
+        try:
+            value = int(value)
+            if 0 <= value <= 360:
+                return value
+            else:
+                raise ValueError("Heading must be an integer between 0 and 360.")
+        except ValueError:
+            raise TypeError("Heading must be an integer between 0 and 360.")
+
+    def get_field_strength(self):
+        self.get_coord('field strength')
 
 
 class Image:
@@ -325,7 +405,7 @@ class Image:
         return
 
     def copy(self):
-        return self.Image
+        return self._image
 
     def invert(self):
         # TODO write invert method.
@@ -344,9 +424,6 @@ class _Display:
 
     def __init__(self, image=Image.EMPTY):
         self.image = Image()
-        self.QUIET_MODE = True
-        self.log = ["===== Python Debug Mode ====="]
-        self.logCount = 0
         self.isOn = True
 
     def get_pixel(self, x, y):
@@ -359,18 +436,24 @@ class _Display:
     def clear(self):
         self.image = Image.EMPTY
 
-    def show(self, image: Image):
-        self.qprint(image)
+    def show_image(self, image, delay=400, wait=True, loop=False, clear=False):
+        _qprint(image)
         self.image = image
-
-    def show(self, value: str, delay=400, *, wait=True, loop=False, clear=False):
-        # TODO implement string value image show.
-        self.qprint(value)
+    
+    def show_string(self, value, delay=400, wait=True, loop=False, clear=False):
+        _qprint(value)
         # self.image = image
+
+    def show(self, value, delay=400, *args, wait=True, loop=False, clear=False):
+        # TODO implement string value image show.
+        if type(value) == Image:
+            self.show_image(value, delay, wait, loop, clear)
+        elif type(value) == str:
+            self.show_string(value, delay, wait, loop, clear)
 
     def scroll(self, value, delay=150, *, wait=True, loop=False, monospace=False):
         # TODO implement other arguments.
-        self.qprint(value)
+        _qprint(value)
 
     def on(self):
         print("Display on.")
@@ -392,16 +475,6 @@ class _Display:
                 raise ValueError("Level must be an integer between 0 and 255.")
         except ValueError:
             raise TypeError("Level must be an integer between 0 and 255.")
-
-    def qprint(self, text):
-        if self.log[len(self.log) - 1] == text:
-            self.logCount += 1
-        elif self.logCount > 0:
-            self.logCount = 0
-            print(text)
-        else:
-            print(text)
-        self.log.append(text)
 
 
 class _MicroBit:
@@ -440,6 +513,7 @@ class _MicroBit:
         self.display = _Display()
         self.accelerometer = _Accelerometer()
         self.audio = _Audio(self.pin0)
+        self.compass = _Compass()
 
     def panic(self, n):
         self.isPanicMode = True
@@ -451,7 +525,7 @@ class _MicroBit:
 
     def sleep(self, n):
         self.timeSlept += n
-        print("Sleeping for {}ms".format(n))
+        _qprint("Sleeping for {}ms".format(n))
 
     def running_time(self):
         userTime = int(input("Enter desired running time, in ms (-1 for automatic): "))
@@ -468,6 +542,7 @@ _microbit = _MicroBit()
 display = _microbit.display
 accelerometer = _microbit.accelerometer
 audio = _microbit.audio
+compass = _microbit.compass
 button_a = _microbit.button_a
 button_b = _microbit.button_b
 pin0 = _microbit.pin0
