@@ -4,11 +4,18 @@ from time import time
 
 print("===== Python Debug Mode =====")
 
+def implement(name):
+    print('{} method is not implemented yet.'.format(name))
+
 
 class _Button:
 
     def __init__(self, name):
         self.name = name
+
+    def is_pressed(self):
+        # TODO write is_pressed method.
+        return
 
     def was_pressed(self):
         print("Press " + self.name + "? (y/n)")
@@ -17,6 +24,10 @@ class _Button:
             return True
         else:
             return False
+
+    def get_presses(self):
+        # TODO write get_presses method.
+        return
 
 
 class _DigitalPin:
@@ -89,12 +100,19 @@ class _TouchPin:
         self.id = idx
         self.type = "touch"
         self.function = function
+        self.CAPACITIVE = "CAPACITIVE"
+        self.RESISITIVE = "RESISTIVE"
+        self.touch_mode = self.CAPACITIVE
 
     def is_touched(self):
         try:
             return bool(input("Enter pin touched status (True/False)"))
         except ValueError:
             raise ValueError("Input must be a boolean.")
+
+    def set_touch_mode(self, value):
+        # TODO write set_touch_mode method.
+        print('set_touch_mode not implemented yet.')
 
 
 class _Accelerometer:
@@ -106,35 +124,24 @@ class _Accelerometer:
         self.z = 0
         self.gestureList = ["up", "down", "left", "right", "face up", "face down", "freefall", "3g", "6g", "8g", "shake"]
 
-    def get_x(self):
+    def _get_coord(self, l_bound, u_bound):
         try:
-            value = int(input("Enter desired x acceleration (0 to 1024): "))
-            if 0 <= value <= 1024:
+            value = int(input("Enter desired x acceleration ({} to {}): ".format(l_bound, u_bound)))
+            if l_bound <= value <= u_bound:
                 return value
             else:
-                raise ValueError("Acceleration must be an integer between 0 and 1024.")
+                raise ValueError("Acceleration must be an integer between {} and {}.".format(l_bound, u_bound))
         except ValueError:
-            raise TypeError("Acceleration must be an integer between 0 and 1024.")
+            raise TypeError("Acceleration must be an integer between {} and {}.".format(l_bound, u_bound))
+
+    def get_x(self):
+        self._get_coord(0, 1024)
 
     def get_y(self):
-        try:
-            value = int(input("Enter desired x acceleration (0 to 1024): "))
-            if 0 <= value <= 1024:
-                return value
-            else:
-                raise ValueError("Acceleration must be an integer between 0 and 1024.")
-        except ValueError:
-            raise TypeError("Acceleration must be an integer between 0 and 1024.")
+        self._get_coord(0, 1024)
 
     def get_z(self):
-        try:
-            value = int(input("Enter desired x acceleration (0 to 1024): "))
-            if 0 <= value <= 1024:
-                return value
-            else:
-                raise ValueError("Acceleration must be an integer between 0 and 1024.")
-        except ValueError:
-            raise TypeError("Acceleration must be an integer between 0 and 1024.")
+        self._get_coord(0, 1024)
 
     def get_values(self):
         try:
@@ -181,14 +188,103 @@ class _Accelerometer:
                              '"face down", "freefall", "3g", "6g", "8g", or "shake".')
 
 
+class _AudioFrame:
+
+    # TODO Check this works!!
+    def __init__(self):
+        self.data = [0]*32
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
+
+    def __iter__(self):
+        return self.data
+
+class _Audio:
+
+    GIGGLE = "Giggle sound"
+    HAPPY = "Happy sound"
+    HELLO = "Hello sound"
+    MYSTERIOUS = "Mysterious sound"
+    SAD = "Sad sound"
+    SLIDE = "Slide sound"
+    SOARING = "Soaring sound"
+    SPRING = "Spring sound"
+    TWINKLE = "Twinkle sound"
+    YAWN = "Yawn sound"
+
+    def __init__(self, pin):
+        self.isPlaying = False
+        self.default_pin = pin
+
+    def play(self, source, wait=True, pin=self.default_pin, return_pin=None):
+        # TODO write play method.
+        implement('play')
+
+    def is_playing(self):
+        # TODO write is_playing method
+        implement('is_playing')
+
+    def stop(self):
+        # TODO write stop method
+        implement('stop')
+
+
 class Image:
     EMPTY = "00000:" * 5
     HEART = "09090:" + "90909:" + "90009:" + "09090:" + "00900:"
+    SMALL_HEART = "00000:" + "09090:" + "09990:" + "00900:" + "00000:"
+    YES = "00000:" + "00009:" + "00090:" + "90900:" + "09000:"
+    NO = "90009:" + "09090:" + "00900:" + "09090:" + "90009:"
+    HAPPY = "00000:" + "09090:" + "00000:" + "90009:" + "09990:"
+    SAD = "00000:" + "09090:" + "00000:" + "09990:" + "90009:"
+    CONFUSED = "00000:" + "09090:" + "00000:" + "09090:" + "90909:"
+    ANGRY = "90009:" + "09090:" + "00000:" + "99999:" + "90909:"
+    ASLEEP = "00000:" + "99099:" + "00000:" + "09990:" + "00000:"
+    SURPRISED = "09090:" + "00000:" + "00900:" + "09090:" + "00900:"
+    SILLY = "90009:" + "00000:" + "99999:" + "00099:" + "00099:"
+    FABULOUS = "99999:" + "99099:" + "00000:" + "09090:" + "09990:"
+    MEH = "99099:" + "00000:" + "00090:" + "00900:" + "09000:"
+    TSHIRT = "99099:" + "99999:" + "09990:" * 3
+    ROLLER_SKATE = "00099:" * 2 + "99999:" * 2 + "09090:"
+    DUCK = "09900:" + "99900:" + "09999:" + "09990:" + "00000:"
+    HOUSE = "00900:" + "09990:" + "99999:" + "09990:" + "09090:"
+    TORTOISE = "00000:" + "09990:" + "99999:" + "09090:" + "00000:"
+    BUTTERFLY = "99099:" + "99999:" + "00900:" + "99999:" + "99099:"
+    STICK_FIGURE = "00900:" + "99999:" + "00900:" + "09090:" + "90009:"
+    GHOST = "09990:" + "09090:" + "99999:" * 2 + "09090:"
+    SWORD = "00900:" * 3 + "09990:" + "00900:"
+    GIRAFFE = "99000:" + "09000:" * 2 + "09990:" + "09090:"
+    SKULL = "09990:" + "90909:" + "99999:" + "09990:" * 2
+    UMBRELLA = "09990:" + "99999:" + "00900:" + "90900:" + "99900:"
+    SNAKE = "99000:" + "99099:" + "09090:" + "09990:" + "00000:"
+    RABBIT = "90900:" * 2 + "99990:" + "99090:" + "99990:"
+    COW = "90009:" * 2 + "99999:" + "09990:" + "00900:"
+    QUARTER_NOTE = "00900:" * 3 + "99900:" * 2
+    EIGTH_NOTE = "00900:" + "00990:" + "00909:" + "99900:" * 2
+    PITCHFORK = "90909:" * 2 + "99999:" + "00900" * 2
+    TARGET = "00900:" + "09990:" + "99099:" + "09990:" + "00900:"
+    TRIANGLE = "00000:" + "00900:" + "09090:" + "99999:" + "00000:"
+    LEFT_TRIANGLE = "90000:" + "99000:" + "90900:" + "90090:" + "99999:"
+    CHESS_BOARD = "09090:" + "90909:" + "09090:" + "90909:" + "09090:"
+    DIAMOND = "00900:" + "09090:" + "90009:" + "09090:" + "00900:"
+    SMALL_DIAMOND = "00000:" + "00900:" + "09090:" + "00900:" + "00000:"
+    SQUARE = "99999:" + "90009:" * 3 + "99999:"
+    SMALL_SQUARE = "00000:" + "09990:" + "09090:" + "09990:" + "00000:"
+    SCISSORS = "99009:" + "99090:" + "00900:" + "99090:" + "99009:"
 
     def __init__(self, image=EMPTY):
+        # TODO implement init methods for each type of input.
         self._image = list(image)
         self._width = 5
         self._height = 5
+
+    # TODO implement image adding and scale multiplication.
+    def __repr__(self):
+        return "".join(self._image)
 
     def __str__(self):
         out = "\n"
@@ -267,7 +363,7 @@ class _Display:
         self.qprint(image)
         self.image = image
 
-    def show(self, value, delay=400, *, wait=True, loop=False, clear=False):
+    def show(self, value: str, delay=400, *, wait=True, loop=False, clear=False):
         # TODO implement string value image show.
         self.qprint(value)
         # self.image = image
@@ -319,9 +415,6 @@ class _MicroBit:
         self.startTime = self.time_ms()
         self.timeSlept = 0
 
-        self.display = _Display()
-        self.accelerometer = _Accelerometer()
-
         self.button_a = _Button('A')
         self.button_b = _Button('B')
         self.pin0 = _TouchPin(0, "Pad 0")
@@ -343,6 +436,10 @@ class _MicroBit:
         self.pin16 = _DigitalPin(16, None)
         self.pin19 = _DigitalPin(19, "I2C SCL")
         self.pin20 = _DigitalPin(20, "I2C SDA")
+
+        self.display = _Display()
+        self.accelerometer = _Accelerometer()
+        self.audio = _Audio(self.pin0)
 
     def panic(self, n):
         self.isPanicMode = True
@@ -370,6 +467,7 @@ class _MicroBit:
 _microbit = _MicroBit()
 display = _microbit.display
 accelerometer = _microbit.accelerometer
+audio = _microbit.audio
 button_a = _microbit.button_a
 button_b = _microbit.button_b
 pin0 = _microbit.pin0
