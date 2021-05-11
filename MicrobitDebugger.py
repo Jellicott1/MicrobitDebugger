@@ -1,4 +1,5 @@
 from time import time
+import sys
 
 # TODO Consider switching raise statements on user input to infinite loops waiting for a valid input.
 
@@ -313,6 +314,71 @@ class _Compass:
         self.get_coord('field strength')
 
 
+class _Radio:
+
+    def __init__(self):
+        self.RATE_250KBIT = 256000
+        self.RATE_1MBIT = 1000000
+        self.RATE_2MBIT = 2000000
+        self.on = False
+        self.configDict = {'length': 32, 'queue': 3, 'channel': 7, 'power': 6, 'address': 0x75626974, 'group': 0,
+                           'data_rate': self.RATE_1MBIT}
+        self.lb = {'length': 1, 'queue': 1, 'channel': 0, 'power': 0, 'address': 0, 'group': 0}
+        self.ub = {'length': 251, 'queue': sys.maxsize, 'channel': 83, 'power': 7, 'address': 2**32-1, 'group': 255}
+
+    def on(self):
+        _qprint("Radio on.")
+        self.on = True
+
+    def off(self):
+        _qprint("Radio off.")
+        self.on = False
+
+    def config(self, **kwargs):
+        keys = list(kwargs.keys())
+        options = list(self.configDict.keys())
+        for item in keys:
+            if item == "data_rate":
+                if kwargs[item] == self.RATE_250KBIT or kwargs[item] == self.RATE_1MBIT or kwargs[item] == self.RATE_2MBIT:
+                    self.configDict[item] = kwargs[item]
+                else:
+                    raise ValueError("data_rate must be either radio.RATE_250KBIT, radio.RATE_1MBIT or"
+                                     " radio.RATE_2MBIT.")
+            elif item in options:
+                if isinstance(kwargs[item], int) and self.lb[item] <= kwargs[item] <= self.ub:
+                    self.configDict[item] = kwargs[item]
+                    _qprint("radio.{} set to {}".format(item, kwargs[item]))
+                else:
+                    raise ValueError("{} must be an integer between {} and {}.".format(item, self.lb[item], self.ub[item]))
+
+    def reset(self):
+        self.__init__()
+
+    def send_bytes(self, message):
+        # TODO write send_bytes method.
+        _implement("send_bytes")
+
+    def receive_bytes(self):
+        # TODO write receive_bytes method.
+        _implement("receive_bytes")
+
+    def receive_bytes_into(self, buffer):
+        # TODO write receive_bytes_into method.
+        _implement("receive_bytes_into")
+
+    def send(self, message):
+        # TODO write send method.
+        _implement("send")
+
+    def receive(self):
+        # TODO write receive method.
+        _implement("receive")
+
+    def receive_full(self):
+        # TODO write receive_full method.
+        _implement("receive_full")
+
+
 class Image:
     EMPTY = "00000:" * 5
     HEART = "09090:" + "90909:" + "90009:" + "09090:" + "00900:"
@@ -514,6 +580,7 @@ class _MicroBit:
         self.accelerometer = _Accelerometer()
         self.audio = _Audio(self.pin0)
         self.compass = _Compass()
+        self.radio = _Radio()
 
     def panic(self, n):
         self.isPanicMode = True
@@ -543,6 +610,7 @@ display = _microbit.display
 accelerometer = _microbit.accelerometer
 audio = _microbit.audio
 compass = _microbit.compass
+radio = _microbit.radio
 button_a = _microbit.button_a
 button_b = _microbit.button_b
 pin0 = _microbit.pin0
