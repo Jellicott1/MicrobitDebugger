@@ -18,6 +18,7 @@ def _qprint(text, prefix=""):
         _logCount += 1
     elif _logCount > 1:
         print("REPEAT: {}".format(_logCount))
+        print()
         if prefix == "":
             print(text)
         else:
@@ -38,7 +39,7 @@ class _Button:
 
     def is_pressed(self):
         # TODO write is_pressed method.
-        return
+        _implement("is_pressed")
 
     def was_pressed(self):
         print("Press " + self.name + "? (y/n)")
@@ -50,7 +51,7 @@ class _Button:
 
     def get_presses(self):
         # TODO write get_presses method.
-        return
+        _implement("is_pressed")
 
 
 class _DigitalPin:
@@ -135,7 +136,7 @@ class _TouchPin:
 
     def set_touch_mode(self, value):
         # TODO write set_touch_mode method.
-        print('set_touch_mode not implemented yet.')
+        _implement("set_touch_mode")
 
 
 class _Accelerometer:
@@ -452,38 +453,43 @@ class Image:
 
     def shift_left(self, n):
         # TODO write shift_left method.
-        return
+        _implement("shift_left")
 
     def shift_right(self, n):
         # TODO write shift_right method.
-        return
+        _implement("shift_right")
 
     def shift_up(self, n):
         # TODO write shift_up method.
-        return
+        _implement("shift_up")
 
     def shift_down(self, n):
-        # TODO write shift_down method.
-        return
+        # TODO check this works!
+        # TODO Check this is functioning as intended
+        self._image = ['0','0','0','0','0',':']*n + self._image[0:(self._width+1)*(self._height-n)]
+        #for i in range(self._height-1, -1, -1):
+        #    for j in range(self._width):
+        #        print((self._width+1)*i+j)
+                #self.image[(self._width+1)*i+j] = self.image[(self._width+1)*(i-1)+j
 
     def crop(self, x, y, w, h):
         # TODO write crop method.
-        return
+        _implement("crop")
 
     def copy(self):
         return self._image
 
     def invert(self):
         # TODO write invert method.
-        return
+        _implement("invert")
 
     def fill(self, value):
         # TODO write fill method.
-        return
+        _implement("fill")
 
     def blit(self, src, x, y, w, h, xdest=0, ydest=0):
         # TODO write blit method.
-        return
+        _implement("blit")
 
 
 class _Display:
@@ -501,13 +507,14 @@ class _Display:
 
     def clear(self):
         self.image = Image.EMPTY
+        _qprint("===== Display Cleared =====")
 
     def show_image(self, image, delay=400, wait=True, loop=False, clear=False):
-        _qprint(image)
+        _qprint(image, prefix="SHOW")
         self.image = image
     
     def show_string(self, value, delay=400, wait=True, loop=False, clear=False):
-        _qprint(value)
+        _qprint(value, prefix="SHOW")
         # self.image = image
 
     def show(self, value, delay=400, *args, wait=True, loop=False, clear=False):
@@ -519,7 +526,7 @@ class _Display:
 
     def scroll(self, value, delay=150, *, wait=True, loop=False, monospace=False):
         # TODO implement other arguments.
-        _qprint(value)
+        _qprint(value, prefix="SCROLL")
 
     def on(self):
         print("Display on.")
