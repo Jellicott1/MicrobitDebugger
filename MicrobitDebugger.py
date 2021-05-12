@@ -381,7 +381,8 @@ class _Radio:
 
 
 class Image:
-    EMPTY = "00000:" * 5
+    EMPTY = "00000:" * 4 + "00000"
+    FULL = "99999:" * 5
     HEART = "09090:" + "90909:" + "90009:" + "09090:" + "00900:"
     SMALL_HEART = "00000:" + "09090:" + "09990:" + "00900:" + "00000:"
     YES = "00000:" + "00009:" + "00090:" + "90900:" + "09000:"
@@ -425,9 +426,33 @@ class Image:
 
     def __init__(self, image=EMPTY):
         # TODO implement init methods for each type of input.
-        self._image = list(image)
-        self._width = 5
-        self._height = 5
+        if type(image) == str:
+            self._image = list(image)
+            if self._image[len(self._image)-1] == ':':  # Check end character is not :
+                raise ValueError("Image string should not end with ':'")
+            lineBreakList = []
+            for i in range(len(self._image)):  # Add index of ':' chars to list, raise error if non-int or ':'
+                if self._image[i] == ':':
+                    lineBreakList.append(i)
+                else:
+                    try:
+                        int(self._image[i])
+                    except ValueError:
+                        raise TypeError("Image string must contain only integers from 0 to 9 and ':'.")
+            if len(lineBreakList) == 0:  # If no ':' assume height is 1
+                self._height = 1
+                self._width = len(self._image)
+                return
+            lineBreakList = [-1] + lineBreakList + [len(self._image)]  # Added line break dummy line breaks at
+            lineBreakDiff = lineBreakList[1]+1                         # beginning and end
+            self._height = 0
+            for i in range(0, len(lineBreakList)-1):  # Check gap between line breaks in consistent
+                if lineBreakDiff == lineBreakList[i+1]-lineBreakList[i]:
+                    lineBreakDiff = lineBreakList[i+1]-lineBreakList[i]
+                else:
+                    raise ValueError("Inconsistent row width.")  # raise error if not
+                self._height += 1
+            self._width = lineBreakDiff-1
 
     # TODO implement image adding and scale multiplication.
     def __repr__(self):
@@ -463,14 +488,15 @@ class Image:
         # TODO write shift_up method.
         _implement("shift_up")
 
-    def shift_down(self, n):
-        # TODO check this works!
-        # TODO Check this is functioning as intended
-        self._image = ['0','0','0','0','0',':']*n + self._image[0:(self._width+1)*(self._height-n)]
-        #for i in range(self._height-1, -1, -1):
-        #    for j in range(self._width):
-        #        print((self._width+1)*i+j)
-                #self.image[(self._width+1)*i+j] = self.image[(self._width+1)*(i-1)+j
+    def shift_down(self, n: int):
+        if n > self._height:
+            n = self._height
+        if n >= 0:
+            self._image = (['0'] * self._width + [':']) * n + self._image[0:(self._width + 1) * (self._height - n)]
+        else:
+            self.shift_up(-n)
+        if self._image[len(self._image)-1] == ':':
+            self._image.pop()
 
     def crop(self, x, y, w, h):
         # TODO write crop method.
