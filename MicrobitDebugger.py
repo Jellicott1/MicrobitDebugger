@@ -38,20 +38,26 @@ class _Button:
         self.name = name
 
     def is_pressed(self):
-        # TODO write is_pressed method.
-        _implement("is_pressed")
+        value = input("Is {} currently being pressed? (y/n): ".format(self.name))
+        if value in ["y", "Y"]:
+            return True
+        else:
+            return False
+
 
     def was_pressed(self):
-        print("Press " + self.name + "? (y/n)")
-        value = input()
+        value = input("Was {} pressed since last call? (y/n): ".format(self.name))
         if value in ["y", "Y"]:
             return True
         else:
             return False
 
     def get_presses(self):
-        # TODO write get_presses method.
-        _implement("is_pressed")
+        value = input("Enter the desired number of presses since last call for {}".format(self.name))
+        try:
+            return int(value)
+        except ValueError:
+            raise TypeError("Value must be an integer.")
 
 
 class _DigitalPin:
